@@ -106,5 +106,5 @@ class Discriminator(nn.Module):
             real_feats = self.mel_d.feat(real) + self.linear_d.feat(real)
         loss = 0
         for f, r in zip(fake_feats, real_feats):
-            loss += (f - r).abs().mean()
+            loss += (f - r).abs().mean() / len(real_feats)
         return loss

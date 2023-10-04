@@ -22,7 +22,7 @@ args = parser.parse_args()
 device = torch.device(args.device)
 
 # Load Vocoder
-vocos = Vocos.from_pretrained("charactr/vocos-mel-24khz")
+vocos = Vocos.from_pretrained("charactr/vocos-mel-24khz").to(device)
 
 # Load convertor
 convertor = Convertor()
@@ -51,6 +51,6 @@ for i, path in enumerate(paths):
         lin_spec = convertor(lin_spec)
         plot_spectrogram(mel_scale(lin_spec).detach().cpu()[0], os.path.join("./outputs/", f"{i}_output.png"))
         wf = vocos.decode(log_mel_scale(lin_spec))
-    wf = torchaudio.functional.resample(wf, 24000, sr) * args.gain
+        wf = torchaudio.functional.resample(wf, 24000, sr) * args.gain
     wf = wf.cpu().detach()
     torchaudio.save(filepath=os.path.join("./outputs/", f"{i}.wav"), src=wf, sample_rate=sr)
