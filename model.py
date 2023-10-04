@@ -4,7 +4,7 @@ import torch.nn.functional as F
 from torch.nn.utils import spectral_norm 
 import torchaudio
 
-from preprocess import log_mel_scale
+from preprocess import mel_scale
 
 
 class ResBlock(nn.Module):
@@ -39,7 +39,7 @@ class Generator(nn.Module):
         return x
 
 
-class LogMelDiscriminator(nn.Module):
+class MelDiscriminator(nn.Module):
     def __init__(self, n_mels=100, internal_channels=256, num_layers=6):
         super().__init__()
         self.input_layer = nn.Conv1d(n_mels, internal_channels, 5, 1, 2)
@@ -47,7 +47,7 @@ class LogMelDiscriminator(nn.Module):
         self.output_layer = nn.Conv1d(internal_channels, 1, 5, 1, 2)
 
     def forward(self, x):
-        x = log_mel_scale(x)
+        x = mel_scale(x)
         x = self.input_layer(x)
         mu = x.mean(dim=(1,2), keepdim=True)
         sigma = x.std(dim=(1,2), keepdim=True) + 1e-6
@@ -58,7 +58,7 @@ class LogMelDiscriminator(nn.Module):
 
     def feat(self, x):
         feats = []
-        x = log_mel_scale(x)
+        x = mel_scale(x)
         x = self.input_layer(x)
         mu = x.mean(dim=(1,2), keepdim=True)
         sigma = x.std(dim=(1,2), keepdim=True) + 1e-6
@@ -94,15 +94,15 @@ class LinearDiscriminator(nn.Module):
 class Discriminator(nn.Module):
     def __init__(self):
         super().__init__()
-        self.log_mel_d = LogMelDiscriminator()
+        self.mel_d = MelDiscriminator()
         self.linear_d = LinearDiscriminator()
 
     def forward(self, x):
-        return [self.log_mel_d(x), self.linear_d(x)]
+        return [self.mel_d(x), self.linear_d(x)]
 
     def feature_matching_loss(self, fake, real):
-        fake_feats = self.log_mel_d.feat(fake) + self.linear_d.feat(fake)
-        real_feats = self.log_mel_d.feat(real) + self.linear_d.feat(real)
+        fake_feats = self.mel_d.feat(fake) + self.linear_d.feat(fake)
+        real_feats = self.mel_d.feat(real) + self.linear_d.feat(real)
         loss = 0
         for f, r in zip(fake_feats, real_feats):
             loss += (f - r).abs().mean()
