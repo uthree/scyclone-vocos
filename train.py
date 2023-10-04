@@ -52,15 +52,15 @@ parser.add_argument('dataset_path_a')
 parser.add_argument('dataset_path_b')
 parser.add_argument('-d', '--device', default='cpu',
                     help="Device setting. Set this option to cuda if you need to use ROCm.")
-parser.add_argument('-e', '--epoch', default=60, type=int)
-parser.add_argument('-b', '--batch', default=16, type=int)
+parser.add_argument('-e', '--epoch', default=100, type=int)
+parser.add_argument('-b', '--batch', default=64, type=int)
 parser.add_argument('-fp16', default=False, type=bool)
 parser.add_argument('-m', '--maxdata', default=-1, type=int, help="max dataset size")
 parser.add_argument('-lr', '--learningrate', default=2e-4, type=float)
 parser.add_argument('-len', '--length', default=32768, type=int)
-parser.add_argument('--consistency', default=5.0, type=float, help="weight of cycle-consistency loss")
+parser.add_argument('--consistency', default=1.5, type=float, help="weight of cycle-consistency loss")
 parser.add_argument('--identity', default=1.0, type=float, help="weight of identity loss")
-parser.add_argument('--feature-matching', default=5.0, type=float, help="weight of feature-matching loss")
+parser.add_argument('--feature-matching', default=1.5, type=float, help="weight of feature-matching loss")
 parser.add_argument('-psa', '--pitch-shift-a', default=0, type=int)
 parser.add_argument('-psb', '--pitch-shift-b', default=0, type=int)
 parser.add_argument('-ga', '--gain-a', default=1, type=float)
@@ -139,10 +139,6 @@ for epoch in range(args.epoch):
         real_b = spectrogram(Tb(real_b.to(device) * args.gain_b * rand_gain)).detach()
 
         # Train G.
-        if batch % grad_accm == 0:
-            OGab.zero_grad()
-            OGba.zero_grad()
-
         with torch.cuda.amp.autocast(enabled=args.fp16):
             fake_b = Gab(real_a)
             fake_a = Gba(real_b)
@@ -178,12 +174,12 @@ for epoch in range(args.epoch):
         if batch % grad_accm == 0:
             scaler.step(OGab)
             scaler.step(OGba)
-        
-        if batch % grad_accm == 0:
-            # Train D.
-            ODa.zero_grad()
-            ODb.zero_grad()
+            OGab.zero_grad()
+            OGba.zero_grad()
 
+        
+        # Train D.
+  
         with torch.cuda.amp.autocast(enabled=args.fp16):
             logits_fake = Da(cutmid(fake_a)) + Db(cutmid(fake_b))
             logits_real = Da(cutmid(real_a)) + Db(cutmid(real_b))
@@ -201,16 +197,19 @@ for epoch in range(args.epoch):
         if batch % grad_accm == 0:
             scaler.step(ODa)
             scaler.step(ODb)
+            ODa.zero_grad()
+            ODb.zero_grad()
+
             scaler.update()
         
-        tqdm.write(f"Id: {loss_G_id.item():.4f}, Adv.: {loss_G_adv.item():.4f}, Cyc.: {loss_G_cyc.item():.4f}, Feat.: {loss_G_feat.item():.4f}")
+        tqdm.write(f"[Epoch {epoch}, Batch {batch}] Id: {loss_G_id.item():.4f}, Adv.: {loss_G_adv.item():.4f}, Cyc.: {loss_G_cyc.item():.4f}, Feat.: {loss_G_feat.item():.4f}")
         bar.set_description(desc=f"G: {loss_G.item():.4f}, D: {loss_D.item():.4f}")
         bar.update(N)
 
         if loss_D.isnan().any() or loss_G.isnan().any():
             exit()
 
-        if batch % 100 == 0:
+        if batch % 300 == 0:
             save_models(Gab, Gba, Da, Db)
 
 save_models(Gab, Gba, Da, Db)
