@@ -4,7 +4,7 @@ import json
 import torchaudio
 import os
 import glob
-from preprocess import spectrogram, log_mel_scale, plot_spectrogram
+from preprocess import spectrogram, mel_scale, log_mel_scale, plot_spectrogram
 from model import Generator as Convertor
 import torch
 from vocos import Vocos
@@ -47,9 +47,9 @@ for i, path in enumerate(paths):
         print(f"converting {path}")
         wf = ps(wf)
         lin_spec = spectrogram(wf)
-        plot_spectrogram(lin_spec.detach().cpu()[0], os.path.join("./outputs/", f"{i}_input.png"))
+        plot_spectrogram(mel_scale(lin_spec).detach().cpu()[0], os.path.join("./outputs/", f"{i}_input.png"))
         lin_spec = convertor(lin_spec)
-        plot_spectrogram(lin_spec.detach().cpu()[0], os.path.join("./outputs/", f"{i}_output.png"))
+        plot_spectrogram(mel_scale(lin_spec).detach().cpu()[0], os.path.join("./outputs/", f"{i}_output.png"))
         wf = vocos.decode(log_mel_scale(lin_spec))
     wf = torchaudio.functional.resample(wf, 24000, sr) * args.gain
     wf = wf.cpu().detach()

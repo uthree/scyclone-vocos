@@ -152,8 +152,7 @@ for epoch in range(args.epoch):
             id_out_b = Gab(real_b)
 
             loss_G_cyc = L1(recon_b, real_b) + L1(recon_a, real_a)
-            loss_G_id = Db.feature_matching_loss(id_out_b, real_b) + Da.feature_matching_loss(id_out_a, real_a) +\
-                    L1(id_out_a, real_a) + L1(id_out_b, real_b)
+            loss_G_id = L1(id_out_a, real_a) + L1(id_out_b, real_b)
             loss_G_feat = Da.feature_matching_loss(recon_a, real_a) +\
                 Db.feature_matching_loss(recon_b, real_b)
 
