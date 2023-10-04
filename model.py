@@ -102,7 +102,8 @@ class Discriminator(nn.Module):
 
     def feature_matching_loss(self, fake, real):
         fake_feats = self.mel_d.feat(fake) + self.linear_d.feat(fake)
-        real_feats = self.mel_d.feat(real) + self.linear_d.feat(real)
+        with torch.no_grad():
+            real_feats = self.mel_d.feat(real) + self.linear_d.feat(real)
         loss = 0
         for f, r in zip(fake_feats, real_feats):
             loss += (f - r).abs().mean()
