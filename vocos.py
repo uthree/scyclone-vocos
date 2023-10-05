@@ -71,7 +71,7 @@ class Vocos(nn.Module):
         m = torch.clamp_max(m, 6.0)
         m = torch.exp(m)
         s = m * (torch.cos(p) + 1j * torch.sin(p))
-        return torch.istft(s, n_fft=self.n_fft)
+        return torch.istft(s, n_fft=self.n_fft, center=True, hop_length=256, onesided=True)
 
 
 class PeriodicDiscriminator(nn.Module):
@@ -271,6 +271,7 @@ class ScaleDiscriminator(nn.Module):
             feats.append(x)
         return feats
 
+
 class Discriminator(nn.Module):
     def __init__(self):
         super().__init__()
@@ -279,7 +280,7 @@ class Discriminator(nn.Module):
         self.SD = ScaleDiscriminator()
     
     def logits(self, x):
-        return self.MPD(x) + self.MRD(x) + [self.SD(x)]
+        return self.MPD(x) + [self.SD(x)]
     
     def feat_loss(self, fake, real):
         with torch.no_grad():
