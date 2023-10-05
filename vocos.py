@@ -218,7 +218,7 @@ class ResolutionDiscriminator(nn.Module):
         return feats
         
     def spectrogram(self, x):
-        x = torch.stft(x, self.n_fft, self.n_fft // 4, return_complex=True, center=True).abs()
+        x = torch.stft(x, self.n_fft, self.n_fft // 4, return_complex=True, center=True, window=None).abs()
         return x
 
 
@@ -243,19 +243,48 @@ class MultiResolutionDiscriminator(nn.Module):
         return feats
 
 
+class ScaleDiscriminator(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.convs = nn.ModuleList([
+            nn.AvgPool1d(2),
+            weight_norm(nn.Conv1d(1, 64, 41, 4, 0)),
+            weight_norm(nn.Conv1d(64, 64, 41, 4, 0)),
+            weight_norm(nn.Conv1d(64, 64, 41, 4, 0)),
+            weight_norm(nn.Conv1d(64, 64, 41, 4, 0)),
+            weight_norm(nn.Conv1d(64, 1, 41, 4, 0)),
+            ])
+
+    def forward(self, x):
+        x = x.unsqueeze(1)
+        for conv in self.convs:
+            x = conv(x)
+            x = F.leaky_relu(x, LRELU_SLOPE)
+        return x
+
+    def feat(self, x):
+        feats = []
+        x = x.unsqueeze(1)
+        for conv in self.convs:
+            x = conv(x)
+            x = F.leaky_relu(x, LRELU_SLOPE)
+            feats.append(x)
+        return feats
+
 class Discriminator(nn.Module):
     def __init__(self):
         super().__init__()
         self.MPD = MultiPeriodicDiscriminator()
         self.MRD = MultiResolutionDiscriminator()
+        self.SD = ScaleDiscriminator()
     
     def logits(self, x):
-        return self.MPD(x) + self.MRD(x)
+        return self.MPD(x) + self.MRD(x) + [self.SD(x)]
     
     def feat_loss(self, fake, real):
         with torch.no_grad():
-            real_feat = self.MPD.feat(real) + self.MRD.feat(real)
-        fake_feat = self.MPD.feat(fake) + self.MRD.feat(fake)
+            real_feat = self.MPD.feat(real) + self.MRD.feat(real) + self.SD.feat(real) + [real]
+        fake_feat = self.MPD.feat(fake) + self.MRD.feat(fake) + self.SD.feat(fake) + [fake]
         loss = 0
         for r, f in zip(real_feat, fake_feat):
             loss = loss + F.l1_loss(f, r)
