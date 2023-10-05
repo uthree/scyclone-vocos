@@ -39,36 +39,6 @@ class Generator(nn.Module):
         return x
 
 
-class MelDiscriminator(nn.Module):
-    def __init__(self, n_mels=100, internal_channels=256, num_layers=6):
-        super().__init__()
-        self.input_layer = nn.Conv1d(n_mels, internal_channels, 5, 1, 2)
-        self.mid_layers = nn.Sequential(*[ResBlock(internal_channels, False, 0.2) for _ in range(num_layers)])
-        self.output_layer = nn.Conv1d(internal_channels, 1, 5, 1, 2)
-
-    def forward(self, x):
-        x = mel_scale(x)
-        x = self.input_layer(x)
-        mu = x.mean(dim=(1,2), keepdim=True)
-        sigma = x.std(dim=(1,2), keepdim=True) + 1e-6
-        x = (x - mu) / sigma
-        x = self.mid_layers(x)
-        x = self.output_layer(x)
-        return x
-
-    def feat(self, x):
-        feats = []
-        x = mel_scale(x)
-        x = self.input_layer(x)
-        mu = x.mean(dim=(1,2), keepdim=True)
-        sigma = x.std(dim=(1,2), keepdim=True) + 1e-6
-        x = (x - mu) / sigma
-        for l in self.mid_layers:
-            x = l(x)
-            feats.append(x)
-        return feats
-
-
 class LinearDiscriminator(nn.Module):
     def __init__(self, input_channels=513, internal_channels=256, num_layers=6):
         super().__init__()
@@ -94,11 +64,10 @@ class LinearDiscriminator(nn.Module):
 class Discriminator(nn.Module):
     def __init__(self):
         super().__init__()
-        self.mel_d = MelDiscriminator()
         self.linear_d = LinearDiscriminator()
 
     def forward(self, x):
-        return [self.mel_d(x), self.linear_d(x)]
+        return [self.linear_d(x)]
 
     def feature_matching_loss(self, fake, real):
         fake_feats = self.linear_d.feat(fake)

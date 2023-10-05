@@ -56,7 +56,7 @@ parser.add_argument('-e', '--epoch', default=100, type=int)
 parser.add_argument('-b', '--batch', default=64, type=int)
 parser.add_argument('-fp16', default=False, type=bool)
 parser.add_argument('-m', '--maxdata', default=-1, type=int, help="max dataset size")
-parser.add_argument('-lr', '--learningrate', default=2e-4, type=float)
+parser.add_argument('-lr', '--learningrate', default=1e-4, type=float)
 parser.add_argument('-len', '--length', default=32768, type=int)
 parser.add_argument('--consistency', default=1.5, type=float, help="weight of cycle-consistency loss")
 parser.add_argument('--identity', default=1.0, type=float, help="weight of identity loss")
@@ -179,7 +179,6 @@ for epoch in range(args.epoch):
 
         
         # Train D.
-  
         with torch.cuda.amp.autocast(enabled=args.fp16):
             logits_fake = Da(cutmid(fake_a)) + Db(cutmid(fake_b))
             logits_real = Da(cutmid(real_a)) + Db(cutmid(real_b))
