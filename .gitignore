@@ -169,3 +169,5 @@ cython_debug/
 *.ogg
 *.mp3
 *.wav
+
+!images/*.png

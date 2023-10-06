@@ -54,7 +54,7 @@ parser.add_argument('dataset_path_a')
 parser.add_argument('dataset_path_b')
 parser.add_argument('-d', '--device', default='cpu',
                     help="Device setting. Set this option to cuda if you need to use ROCm.")
-parser.add_argument('-e', '--epoch', default=60, type=int)
+parser.add_argument('-e', '--epoch', default=1000, type=int)
 parser.add_argument('-b', '--batch', default=64, type=int)
 parser.add_argument('-fp16', default=False, type=bool)
 parser.add_argument('-m', '--maxdata', default=-1, type=int, help="max dataset size")
