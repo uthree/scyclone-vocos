@@ -19,7 +19,7 @@ parser.add_argument('-o', '--output', default=0, type=int)
 parser.add_argument('-l', '--loopback', default=-1, type=int)
 parser.add_argument('-ig', '--input-gain', default=1.0, type=float)
 parser.add_argument('-g', '--gain', default=1.0, type=float)
-parser.add_argument('-thr', '--threshold', default=-45.0, type=float)
+parser.add_argument('-thr', '--threshold', default=-40.0, type=float)
 parser.add_argument('-v', '--vocoderpath', default='./vocoder_g.pt', type=str)
 parser.add_argument('-m', '--modelpath', default='./g_a2b.pt')
 parser.add_argument('-b', '--buffersize', default=8, type=int)
@@ -121,7 +121,7 @@ while True:
                 # pass Vocoder
                 data = vocoder(spec)
             # gain
-            data = torchaudio.functional.gain(data, loudness + args.gain)
+            data = torchaudio.functional.gain(data, args.gain)
             # Upsample
             data = torchaudio.functional.resample(data, 22050, 44100)
             data = data[0]
