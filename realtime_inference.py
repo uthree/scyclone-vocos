@@ -28,6 +28,7 @@ parser.add_argument('-ic', '--inputchannels', default=1, type=int)
 parser.add_argument('-oc', '--outputchannels', default=1, type=int)
 parser.add_argument('-lc', '--loopbackchannels', default=1, type=int)
 parser.add_argument('-ps', '--pitch-shift', default=0, type=int)
+parser.add_argument('-isr', '--internal-sampling-rate', default=16000, type=int)
 parser.add_argument('-compile', default=False, type=bool)
 parser.add_argument('-fp16', default=False, type=bool)
 
@@ -125,7 +126,8 @@ while True:
             # gain
             data = torchaudio.functional.gain(data, args.gain)
             # Upsample
-            data = torchaudio.functional.resample(data, 22050, 44100)
+            data = torchaudio.functional.resample(data, 22050, args.internal_sampling_rate)
+            data = torchaudio.functional.resample(data, args.internal_sampling_rate, 44100)
             data = data[0]
     data = data.cpu().numpy()
     data = (data) * 32768
