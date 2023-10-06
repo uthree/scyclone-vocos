@@ -1,4 +1,4 @@
-# Scyclone + Vocos : AI Based Voice Conversion System
+# Scyclone + Vocos : The Lightweight AI Based Voice Conversion
 
 this repository is voice conversion system.
 
