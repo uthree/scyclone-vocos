@@ -67,4 +67,3 @@ class Discriminator(nn.Module):
                 y = l(y)
             out += (x-y).abs().mean()
         return out
-
