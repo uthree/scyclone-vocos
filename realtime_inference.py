@@ -57,6 +57,7 @@ convertor = convertor.to(device)
 # Load Vocoder
 vocoder = Vocoder()
 vocoder.load_state_dict(torch.load(args.vocoderpath, map_location=device))
+vocoder = vocoder.to(device)
 
 if args.compile:
     print("Compiling Models...")
