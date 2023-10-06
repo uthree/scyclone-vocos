@@ -120,6 +120,8 @@ while True:
                 spec = convertor(spec)
                 # pass Vocoder
                 data = vocoder(spec)
+            else:
+                data = data * 0
             # gain
             data = torchaudio.functional.gain(data, args.gain)
             # Upsample
