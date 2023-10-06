@@ -21,7 +21,7 @@ parser.add_argument('-dp', '--discriminator-path', default="vocoder_d.pt")
 parser.add_argument('-d', '--device', default='cpu')
 parser.add_argument('-e', '--epoch', default=1000, type=int)
 parser.add_argument('-b', '--batch-size', default=1, type=int)
-parser.add_argument('-lr', '--learning-rate', default=1e-4, type=float)
+parser.add_argument('-lr', '--learning-rate', default=2e-4, type=float)
 parser.add_argument('-len', '--length', default=65536, type=int)
 parser.add_argument('-m', '--max-data', default=-1, type=int)
 parser.add_argument('-fp16', default=False, type=bool)
@@ -66,6 +66,9 @@ scaler = torch.cuda.amp.GradScaler(enabled=args.fp16)
 
 OptG = optim.AdamW(G.parameters(), lr=args.learning_rate)
 OptD = optim.AdamW(D.parameters(), lr=args.learning_rate)
+
+SchedulerG = optim.lr_scheduler.ExponentialLR(OptG, 0.98)
+SchedulerD = optim.lr_scheduler.ExponentialLR(OptD, 0.98)
 
 mel = torchaudio.transforms.MelSpectrogram(n_fft=1024, n_mels=80).to(device)
 
@@ -116,6 +119,8 @@ for epoch in range(args.epoch):
         if batch % 100 == 0:
             save_models(G, D)
             write_preview(fake_wave[0].unsqueeze(0))
+    SchedulerD.step(1)
+    SchedulerG.step(1)
 
 print("Training Complete!")
 save_models(G, D)
