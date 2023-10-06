@@ -170,4 +170,5 @@ cython_debug/
 *.mp3
 *.wav
 
-!images/*.png
+!images/*
+!requirements.txt

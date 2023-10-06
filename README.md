@@ -64,7 +64,7 @@ python3 audio_device_list.py
 
 2. run realtime inference.
 ```sh
-python3 realtime_inference -i <input device ID> -o <output device ID> -d cuda
+python3 realtime_inference.py -i <input device ID> -o <output device ID> -d cuda
 ```
 
 ## References
