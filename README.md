@@ -13,7 +13,7 @@ successor of [VoiceChanger](https://github.com/uthree/voicechanger)
 - Python3.10 or later
 
 ## Usage
-1. Clone this repository and movve directory
+1. Clone this repository and move directory
 ```sh
 git clone https://github.com/uthree/scyclone-vocos
 cd scyclone-vocos
