@@ -2,7 +2,9 @@
 
 this repository is voice conversion system.
 
-[Arch.](URL)
+successor of [VoiceChanger](https://github.com/uthree/voicechanger)
+
+[Arch.](https://github.com/uthree/scyclone-vocos/blob/main/images/arch.png)
 
 ## Requirements
 
@@ -50,7 +52,7 @@ you can accelerate training via 16-bit floating point expression if GPU is newer
 
 6. Check converting quality (validation)
 ```sh
-python3 inference_vc.py <path to your voices directory>
+python3 inference_vc.py -i <path to your voices directory>
 ```
 
 ## Realtime voice conversion
