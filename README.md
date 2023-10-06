@@ -4,7 +4,7 @@ this repository is voice conversion system.
 
 successor of [VoiceChanger](https://github.com/uthree/voicechanger)
 
-[Arch.](https://github.com/uthree/scyclone-vocos/blob/main/images/arch.png)
+![Arch.](https://github.com/uthree/scyclone-vocos/blob/main/images/arch.png)
 
 ## Requirements
 
