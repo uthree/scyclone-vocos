@@ -1,6 +1,6 @@
-# Scyclone + Vocos : The Lightweight AI Based Voice Conversion
+# Scyclone-Vocos
 
-this repository is voice conversion system.
+this repository is a lightweight voice conversion system.
 
 successor of [VoiceChanger](https://github.com/uthree/voicechanger)
 
@@ -10,6 +10,7 @@ successor of [VoiceChanger](https://github.com/uthree/voicechanger)
 
 - NVIDIA GPU
 - Audio devices
+- Python3.10 or later
 
 ## Usage
 1. Clone this repository and movve directory
