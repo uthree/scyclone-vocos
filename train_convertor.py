@@ -142,7 +142,7 @@ for epoch in range(args.epoch):
         real_a = spectrogram(Ta(real_a.to(device) * args.gain_a * rand_gain)).detach()
         real_b = spectrogram(Tb(real_b.to(device) * args.gain_b * rand_gain)).detach()
         real_a = torch.roll(real_a, random.randint(-5, 5), dims=1)
-        real_b = torch.roll(real_a, random.randint(-5, 5), dims=1)
+        real_b = torch.roll(real_b, random.randint(-5, 5), dims=1)
 
         # Train G.
         if batch % grad_accm == 0:
