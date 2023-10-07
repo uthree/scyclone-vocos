@@ -107,10 +107,10 @@ ds_b = WaveFileDirectory(
 dl_a = torch.utils.data.DataLoader(ds_a, batch_size=args.batch, shuffle=True)
 dl_b = torch.utils.data.DataLoader(ds_b, batch_size=args.batch, shuffle=True)
 
-OGab = optim.Adam(Gab.parameters(), lr=args.learningrate, betas=(0.5, 0.999))
-OGba = optim.Adam(Gba.parameters(), lr=args.learningrate, betas=(0.5, 0.999))
-ODa = optim.Adam(Da.parameters(), lr=args.learningrate, betas=(0.5, 0.999))
-ODb = optim.Adam(Db.parameters(), lr=args.learningrate, betas=(0.5, 0.999))
+OGab = optim.Adam(Gab.parameters(), lr=args.learning_rate, betas=(0.5, 0.999))
+OGba = optim.Adam(Gba.parameters(), lr=args.learning_rate, betas=(0.5, 0.999))
+ODa = optim.Adam(Da.parameters(), lr=args.learning_rate, betas=(0.5, 0.999))
+ODb = optim.Adam(Db.parameters(), lr=args.learning_rate, betas=(0.5, 0.999))
 
 if args.pitch_shift_a != 0:
     Ta = torchaudio.transforms.PitchShift(22050, args.pitch_shift_a).to(device)
