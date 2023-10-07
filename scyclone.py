@@ -41,6 +41,10 @@ class Generator(nn.Module):
         return x
 
 
+def safe_log(x):
+    x = torch.log(torch.clamp(x, min=1e-7))
+    return x
+
 class Discriminator(nn.Module):
     def __init__(self, input_channels=513, internal_channels=256, num_layers=6, groups=1):
         super().__init__()

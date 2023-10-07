@@ -141,6 +141,8 @@ for epoch in range(args.epoch):
         rand_gain = torch.rand(N, 1,  device=device) * 0.75 + 0.25
         real_a = spectrogram(Ta(real_a.to(device) * args.gain_a * rand_gain)).detach()
         real_b = spectrogram(Tb(real_b.to(device) * args.gain_b * rand_gain)).detach()
+        real_a = torch.roll(real_a, random.randint(-5, 5), dims=1)
+        real_b = torch.roll(real_a, random.randint(-5, 5), dims=1)
 
         # Train G.
         if batch % grad_accm == 0:
@@ -156,8 +158,7 @@ for epoch in range(args.epoch):
             id_out_b = Gab(real_b)
 
             loss_G_cyc = L1(recon_b, real_b) + L1(recon_a, real_a)
-            loss_G_id = Db.feature_matching_loss(id_out_b, real_b) + Da.feature_matching_loss(id_out_a, real_a) +\
-                    L1(id_out_a, real_a) + L1(id_out_b, real_b)
+            loss_G_id = L1(id_out_a, real_a) + L1(id_out_b, real_b)
             loss_G_feat = Da.feature_matching_loss(recon_a, real_a) +\
                 Db.feature_matching_loss(recon_b, real_b)
 
