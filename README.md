@@ -8,7 +8,8 @@ successor of [VoiceChanger](https://github.com/uthree/voicechanger)
 
 ## Requirements
 
-- NVIDIA GPU
+- NVIDIA GPU or MPS GPU (MacOS)
+- PyTorch GPU Environment (for training)
 - Audio devices
 - Python3.10 or later
 
@@ -40,6 +41,7 @@ or create `inputs` directory and run
 ```sh
 python3 inference_vocoder.py
 ```
+Check outputs directory.
 
 5. Train spectrogram convertor
 put your voice files in one folder, put the target speaker's audio files in another one folder.
@@ -55,6 +57,7 @@ you can accelerate training via 16-bit floating point expression if GPU is newer
 ```sh
 python3 inference_vc.py -i <path to your voices directory>
 ```
+Check outputs directory.
 
 ## Realtime voice conversion
 1. Check list of input device and output device.
@@ -64,8 +67,10 @@ python3 audio_device_list.py
 
 2. run realtime inference.
 ```sh
-python3 realtime_inference.py -i <input device ID> -o <output device ID> -d cuda
+python3 realtime_inference.py -i <input device ID> -o <output device ID>
 ```
+
+add `-d cuda` option if you need to use GPU.
 
 ## References
 
