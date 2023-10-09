@@ -280,7 +280,7 @@ class Discriminator(nn.Module):
         self.SD = ScaleDiscriminator()
     
     def logits(self, x):
-        return self.MPD(x) + [self.SD(x)]
+        return self.MPD(x) + self.MRD(x)
     
     def feat_loss(self, fake, real):
         with torch.no_grad():
