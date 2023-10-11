@@ -72,6 +72,10 @@ SchedulerD = optim.lr_scheduler.ExponentialLR(OptD, 0.98)
 
 mel = torchaudio.transforms.MelSpectrogram(n_fft=1024, n_mels=80).to(device)
 
+def log_mel(x):
+    x = mel(x)
+    return torch.log(mel + 1e-5)
+
 for epoch in range(args.epoch):
     tqdm.write(f"Epoch #{epoch}")
     bar = tqdm(total=len(ds))
@@ -85,7 +89,7 @@ for epoch in range(args.epoch):
             fake_wave = G(spec)
             logits = D.logits(fake_wave)
             
-            loss_mel = (mel(fake_wave) - mel(wave)).abs().mean()
+            loss_mel = (log_mel(fake_wave) - log_mel(wave)).abs().mean()
             loss_feat = D.feat_loss(fake_wave, wave)
             loss_adv = 0
             for logit in logits:
