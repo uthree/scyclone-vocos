@@ -74,7 +74,7 @@ mel = torchaudio.transforms.MelSpectrogram(n_fft=1024, n_mels=80).to(device)
 
 def log_mel(x):
     x = mel(x)
-    return torch.log(mel + 1e-5)
+    return torch.log(x + 1e-5)
 
 for epoch in range(args.epoch):
     tqdm.write(f"Epoch #{epoch}")
