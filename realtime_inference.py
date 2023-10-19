@@ -19,7 +19,6 @@ parser.add_argument('-o', '--output', default=0, type=int)
 parser.add_argument('-l', '--loopback', default=-1, type=int)
 parser.add_argument('-ig', '--input-gain', default=1.0, type=float)
 parser.add_argument('-g', '--gain', default=1.0, type=float)
-parser.add_argument('-thr', '--threshold', default=-40.0, type=float)
 parser.add_argument('-v', '--vocoderpath', default='./vocoder_g.pt', type=str)
 parser.add_argument('-m', '--modelpath', default='./g_a2b.pt')
 parser.add_argument('-b', '--buffersize', default=8, type=int)
@@ -99,8 +98,6 @@ while True:
         del input_buff[0]
     else:
         continue
-    if not data.max() > args.threshold:
-        data = data * 0
     data = np.concatenate(input_buff, 0)
     data = data.astype(np.float32) / 32768 # convert -1 to 1
     data = torch.from_numpy(data).to(device)
@@ -112,17 +109,12 @@ while True:
             data = pitch_shift(data)
             # Downsample
             data = torchaudio.functional.resample(data, 44100, 22050)
-            # Calculate loudness
-            loudness = torchaudio.functional.loudness(data, 22050)
-            if loudness.item() > args.threshold:
-                # to spectrogram
-                spec = spectrogram(data)
-                # convert voice
-                spec = convertor(spec)
-                # pass Vocoder
-                data = vocoder(spec)
-            else:
-                data = data * 0
+            # to spectrogram
+            spec = spectrogram(data)
+            # convert voice
+            spec = convertor(spec)
+            # pass Vocoder
+            data = vocoder(spec)
             # gain
             data = torchaudio.functional.gain(data, args.gain)
             # Upsample
