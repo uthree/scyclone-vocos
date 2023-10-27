@@ -16,7 +16,6 @@ class ResBlock(nn.Module):
 
     def forward(self, x):
         res = x
-        x[:, 0, :] += torch.randn(1, 1, device=x.device) * 0.1
         x = self.c1(x)
         x = self.act(x)
         x = F.dropout(x, p=self.dropout_rate)
